@@ -1,29 +1,31 @@
-import { Task } from "~/entities/task"
+import { Task, TaskStatus } from "~/entities/task"
 import { useEffect, useRef } from 'react';
 import { TaskCard } from "~/components/task-card";
 import { Form } from "@remix-run/react";
 
-
-export function TaskList(props: {tasks: Task[]}) {
-    const cards = props.tasks.map((task) => {
+export function TaskList(props: {tasks: Task[], status: TaskStatus}) {
+    const cards = props.tasks.filter((task) => {
+        return task.status == props.status
+    })
+    .map((task) => {
         return <li><TaskCard task={task}></TaskCard></li>
-      })
-    
-      const formRef = useRef<HTMLFormElement>(null);
-      const titleRef = useRef<HTMLInputElement>(null);
-    
-      useEffect(() => {
+    })
+
+    const formRef = useRef<HTMLFormElement>(null);
+
+    useEffect(() => {
         formRef.current?.reset();
-        titleRef.current?.focus();
-      });
-    
-      return (
-        <div>
-          <ul>{cards}</ul>
-          <Form replace method="post" ref={formRef} >
-            <input type="text" name="name" ref={titleRef} />
-            <button type="submit">+</button>
-          </Form>
-        </div>
-      );
+    });
+
+    return (
+    <div>
+        <p>{props.status}</p>
+        <ul>{cards}</ul>
+        <Form replace method="post" ref={formRef} >
+        <input type="hidden" name="status" value={props.status} />
+        <input type="text" name="name" />
+        <button type="submit">+</button>
+        </Form>
+    </div>
+    );
 }
